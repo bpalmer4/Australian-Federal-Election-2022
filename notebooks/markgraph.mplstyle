@@ -1,0 +1,53 @@
+# Mark Graph Style Sheet
+
+font.family: sans-serif
+font.style: normal
+font.variant: normal
+font.weight: medium
+font.stretch: normal
+font.sans-serif: Helvetica, Arial, Avant Garde, sans-serif
+font.size: 14.0
+
+lines.linewidth: 2.0
+lines.solid_capstyle: butt
+
+legend.fancybox: true
+legend.fontsize: xx-small
+legend.framealpha: 0.5
+
+axes.prop_cycle: cycler('color', ['ef5962', '5a9dd2', '7dc16d', 'f9a560', '9d69aa', 'cd6f5a', 'd680b3', '737373'])
+axes.facecolor: white
+axes.titlesize: large  # fontsize of the axes title
+axes.labelsize: medium # x and y label size
+axes.labelcolor: 111111
+axes.axisbelow: true
+axes.grid: true
+axes.edgecolor: white
+axes.linewidth: 0.01
+
+patch.edgecolor: white
+patch.linewidth: 0.01
+
+svg.fonttype: path
+
+grid.linestyle: -
+grid.linewidth: 0.5
+grid.color: e7e7e7
+
+xtick.major.size: 0
+xtick.minor.size: 0
+xtick.labelsize: small
+xtick.color: 333333
+ytick.major.size: 0
+ytick.minor.size: 0
+ytick.labelsize: small
+ytick.color: 333333
+
+figure.figsize: 9, 4.5 # inches
+figure.facecolor: white
+
+text.color: black
+
+savefig.edgecolor: white
+savefig.facecolor: white
+
