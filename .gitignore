@@ -13,3 +13,4 @@ __pycache__/
 
 # unnecessary detail to be ignored
 charts/**
+data/**
