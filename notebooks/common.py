@@ -1,6 +1,32 @@
 # common.py
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import pathlib
+import requests
+import bs4
+
+# --- WEB BASED DATA CAPTURE --
+
+def get_url_text(url: str):
+    response = requests.get(url)
+    assert(response.status_code == 200) # successful retrieval
+    return response.text
+
+
+def get_tables(text):
+    soup = bs4.BeautifulSoup(text, features="lxml")
+    tables = soup.findAll('table')
+    return tables
+
+
+def get_table_from_text(number, text):
+    tables = get_tables(text)
+    html = str(tables[number])
+    df = pd.read_html(html, flavor='bs4', na_values='–')[0]
+    df = df.dropna(axis=0, how='all') # remove empty rows
+    df = df.dropna(axis=1, how='all') # remove empty columns
+    return df
 
 
 # --- PLOTTING ---
