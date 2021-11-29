@@ -70,7 +70,7 @@ def fix_numerical_cols(t: pd.DataFrame) -> pd.DataFrame:
         'Morrison', 'Albanese',
         'Sample size', 
         # For historical cycles
-        'TPP vote',
+        'TPP vote', '2PP vote', 
         'Political parties',
         'Two-party-preferred',
     )
@@ -206,6 +206,12 @@ def clean(table: pd.DataFrame) -> pd.DataFrame:
     # because it makes the checking row additions simpler
     
     return t
+
+
+def flatten_col_names(columns: pd.Index) -> List[str]:
+    """Flatten the hierarchical column index."""
+    
+    return [' '.join(col).strip() for col in columns.values]
 
 
 # --- PLOTTING ---
