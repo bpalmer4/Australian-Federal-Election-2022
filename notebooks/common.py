@@ -239,7 +239,7 @@ def bayes_poll_aggregation(df,
                            poll_column=None,
                            date_column=None,
                            firm_column=None,
-                           assumed_sample_size=1000,
+                           assumed_sample_size=1_000,
                            num_chains=4,
                            num_samples=2_500):
     """Calculate a Bayesian aggregation for a series of polling results"""
@@ -293,6 +293,139 @@ def bayes_poll_aggregation(df,
     return fit, first_day, brand_map
 
 
+def bayes_poll_aggregation_plots(df, 
+                                 fit, 
+                                 first_day, 
+                                 brand_map,
+                              poll_column,
+                              date_column,
+                              firm_column,
+                                 party,
+                                 title,
+                                 line_color,
+                                 point_color,
+                                s_args):
+    
+    # This is a bit of a hack, and certainly too long a function
+    
+    # a framework for quantifying where the samples lie
+    quants = [0.005, 0.025, 0.100, 0.250, 0.500, 0.750, 0.900, 0.975, 0.995]
+    LOW, HIGH = 'low', 'high'
+    ranges = pd.DataFrame({
+        '99%': (0.005, 0.995),
+        '95%': (0.025, 0.975),
+        '80%': (0.100, 0.900),
+        '50%': (0.250, 0.750),
+    }, index=[LOW, HIGH]).T
+
+    # results in DataFrame
+    results_df = fit.to_frame()
+    
+    # Get the daily hidden vote share data
+    hvs = (
+        results_df[
+            results_df.columns[
+                results_df.columns.str.contains('hidden_vote_share')
+            ]
+        ]
+    )
+    hvs.columns = pd.date_range(start=first_day, freq='D', 
+                                periods=len(hvs.columns))
+    hvs = hvs.quantile(quants)
+    
+    # plot this daily hidden vote share
+    fig, ax = initiate_plot()
+    alpha = 0.1
+    for x, y in ranges.iterrows():
+        low = y[0]
+        high = y[1]
+        lowpoint = hvs.loc[low]
+        highpoint = hvs.loc[high]
+        ax.fill_between(x=lowpoint.index, y1=lowpoint, y2=highpoint,
+                        color=line_color, alpha = alpha,label=x,)
+        alpha += 0.075
+    
+    ax.plot(hvs.columns, hvs.loc[0.500], 
+            color=line_color, lw=1, label='Median')
+
+    # annotate end-point median to one devimal place ...
+    ax.text(hvs.columns[-1] + pd.Timedelta(days=10), 
+            hvs.loc[0.500][-1], 
+            f'{hvs.loc[0.500].round(1)[-1]}',
+            rotation=90, ha='left', va='center',
+            fontsize=14)
+
+    BENCHMARK = 50
+    span = ax.get_ylim()
+    if span[0] <= BENCHMARK <= span[1]:
+        ax.axhline(y=BENCHMARK, c='#555555', lw=1.5)
+
+    markers = ['x', '+', '1', '2', '3', '4', '<', '>', '^', 'v', 'o', 's', '*', ]
+    for i, brand in enumerate(sorted(df[firm_column].unique())):
+        subset = df[df[firm_column] == brand].copy()
+        a = subset[date_column]
+        b = subset[poll_column]
+        #print('DEBUG', len(subset), len(a), len(b), type(a), type(b), a, b)
+        #display(subset)
+        if not len(subset):
+            continue # ignore empty subsets
+        ax.scatter(a, b, marker=markers[i], label=brand, color='#333333')
+
+    ax.legend(loc='best', ncol=2)
+    
+    plot_finalise(ax, 
+                         title=f'{party} {title}',
+                         ylabel=f'Per cent vote share for {party}',
+                         **s_args,
+                        )
+
+    # get the house effects data
+    house_effects = results_df[results_df.columns[results_df.columns.str.contains('houseEffect')]]
+
+    # map the ugly column names back to something meaningful
+    house_effects.columns = (
+        house_effects.columns
+        .str.extract(r'([\d]+)$')
+        .pipe(lambda x: x[x.columns[0]])
+        .astype(int)
+        .map(brand_map)
+    )
+
+    # get sample quants
+    house_effects = house_effects.quantile(quants)
+    
+    # plot the house effects data
+    fig, ax = initiate_plot()
+
+    for i, house in enumerate(house_effects.columns):
+        alpha = 0.1
+        for x, y in ranges.iterrows():
+            low = y[0]
+            high = y[1]
+            lowpoint = house_effects.loc[low, house]
+            width = house_effects.loc[high, house] - lowpoint
+            label = x if i == 0 else None
+            ax.barh(y=house, left=lowpoint, width=width, 
+                    height=0.5, color=line_color, alpha=alpha,
+                    label=label)
+            alpha += 0.075
+
+    ax.scatter(y=range(len(house_effects.columns)), 
+               x=house_effects.loc[0.500],
+               marker='d', facecolor='white',
+               edgecolor=line_color, 
+               linewidth=0.5, zorder=2,
+               label='Median', s=90)
+
+    print(house_effects.loc[0.500])
+    ax.legend(loc='best')
+
+    plot_finalise(ax, 
+                         title=f'{party} {title} (House Effects)',
+                         xlabel=f'Percentage Points (towards {party})',
+                         **s_args, )
+    
+    
 # --- PLOTTING ---
 
 COLOR_COALITION = 'darkblue'
