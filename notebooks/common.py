@@ -6,6 +6,8 @@ import pathlib
 import requests
 import bs4
 import re
+import statsmodels.api as sm
+import stan # install with pip - conda is problematic on the M1 MBP
 
 from typing import List
 
@@ -212,6 +214,83 @@ def flatten_col_names(columns: pd.Index) -> List[str]:
     """Flatten the hierarchical column index."""
     
     return [' '.join(col).strip() for col in columns.values]
+
+
+# --- STATISTICAL ---
+
+# Calulcate a LOWESS regression
+def get_lowess(votes, dates, period=60):
+
+    day = (dates - dates.min()) / pd.Timedelta(days=1) + 1
+    frac = period / day.max()
+    lowess = sm.nonparametric.lowess(
+        endog=votes, exog=day, # y, x ...
+        frac=frac, is_sorted=True)
+
+    lowess = {int(x[0]): x[1] for x in lowess}
+    lowess = day.map(lowess).interpolate()
+    lowess.index = dates
+
+    return lowess, period
+
+
+# Bayesian aggregation of vote time-series data
+def bayes_poll_aggregation(df, 
+                           poll_column=None,
+                           date_column=None,
+                           firm_column=None,
+                           assumed_sample_size=1000,
+                           num_chains=4,
+                           num_samples=2_500):
+    """Calculate a Bayesian aggregation for a series of polling results"""
+    
+    # initial sanity checks
+    assert df[poll_column].notna().all()
+    assert df[date_column].notna().all()
+    assert df[firm_column].notna().all()
+    assert (df[poll_column] >= 0).all()
+    assert (df[poll_column] <= 100).all()
+    
+    # preparation
+    print(f'Stan version: {stan.__version__}')
+    df = df.copy() # do no harm
+    
+    pseudoSampleSigma = np.sqrt((50 * 50) / assumed_sample_size)
+    
+    first_day = df['Mean Date'].min()
+    df['_Day'] = (
+        ((df[date_column] - first_day) 
+         / pd.Timedelta(days=1)).astype(int) 
+        + 1
+    )
+    
+    df[firm_column] = df[firm_column].astype('category')
+    df['_House'] = df[firm_column].cat.codes + 1
+    brand_map = {x+1: y for x, y in zip(df[firm_column].cat.codes, df[firm_column])}
+
+    model_data = {
+        'n_polls': len(df),
+        'n_days': int(df['_Day'].max()),
+        'n_houses': int(df['_House'].max()),
+        'centre_offset': df[poll_column].mean(),
+
+        'pseudoSampleSigma': pseudoSampleSigma,
+    
+        'y': df[poll_column].to_list(),
+        'house': df['_House'].to_list(),
+        'day': df['_Day'].to_list(),
+    }
+    # print(model_data)
+    
+    # load model
+    with open('2pp.stan') as f:
+        model_code = f.read()
+        
+    # run model
+    posterior = stan.build(model_code, data=model_data)
+    fit = posterior.sample(num_chains=num_chains, num_samples=num_samples)
+    
+    return fit, first_day, brand_map
 
 
 # --- PLOTTING ---
