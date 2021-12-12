@@ -8,10 +8,35 @@ import bs4
 import re
 import statsmodels.api as sm
 import stan # install with pip - conda is problematic on the M1 MBP
+import os
+import time
+import datetime
 
 from typing import List
 
 
+# --- WARNINGS ---
+
+_warnings = []
+
+def warn(message):
+    print(message)
+    _warnings.append(message)
+
+
+def print_warnings():
+    for i, w in enumerate(_warnings):
+        print(f'{i+1:3d}: {w}')
+
+
+def check_file_current(filename, message):
+    file_status = os.stat(filename)
+    modified_date = datetime.date(*time.localtime(file_status.st_mtime)[:3])
+    today = datetime.date.today()
+    if modified_date != today:
+        warn(f'{filename}: File looks old. ' + message)
+
+        
 # --- WEB BASED DATA CAPTURE --
 
 def get_url_text(url: str):
