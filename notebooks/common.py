@@ -241,7 +241,7 @@ def flatten_col_names(columns: pd.Index) -> List[str]:
     return [' '.join(col).strip() for col in columns.values]
 
 
-# --- STATISTICAL ---
+# --- POLL AGGREGATION ---
 
 # Calulcate a LOWESS regression
 def get_lowess(votes, dates, period=60):
@@ -383,7 +383,7 @@ def bayes_poll_aggregation_plots(df,
     BENCHMARK = 50
     span = ax.get_ylim()
     if span[0] <= BENCHMARK <= span[1]:
-        ax.axhline(y=BENCHMARK, c='#555555', lw=1.5)
+        ax.axhline(y=BENCHMARK, c='#999999', lw=0.5)
 
     markers = ['x', '+', '1', '2', '3', '4', '<', '>', '^', 'v', 'o', 's', '*', ]
     for i, brand in enumerate(sorted(df[firm_column].unique())):
@@ -394,15 +394,15 @@ def bayes_poll_aggregation_plots(df,
         #display(subset)
         if not len(subset):
             continue # ignore empty subsets
-        ax.scatter(a, b, marker=markers[i], label=brand, color='#333333')
+        ax.scatter(a, b, marker=markers[i], label=brand, color=point_color)
 
     ax.legend(loc='best', ncol=2)
     
     plot_finalise(ax, 
-                         title=f'{party} {title}',
-                         ylabel=f'Per cent vote share for {party}',
-                         **s_args,
-                        )
+                  title=f'{party} {title}',
+                  ylabel=f'Per cent vote share for {party}',
+                  **s_args,
+                 )
 
     # get the house effects data
     house_effects = results_df[results_df.columns[results_df.columns.str.contains('houseEffect')]]
@@ -454,9 +454,14 @@ def bayes_poll_aggregation_plots(df,
 # --- PLOTTING ---
 
 COLOR_COALITION = 'darkblue'
-COLOR_LABOR = '#dd0000'
+COLOR_LABOR = 'darkred'
 COLOR_OTHER = 'darkorange'
 COLOR_GREEN = 'darkgreen'
+
+P_COLOR_COALITION = '#0000dd'
+P_COLOR_LABOR = '#dd0000'
+P_COLOR_OTHER = 'orange'
+P_COLOR_GREEN = 'green'
 
 
 def initiate_plot():
