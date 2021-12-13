@@ -318,6 +318,14 @@ def bayes_poll_aggregation(df,
     return fit, first_day, brand_map
 
 
+def add_h_refence(ax, reference):
+    """Add a horizontal reference line."""
+
+    span = ax.get_ylim() 
+    if span[0] <= reference <= span[1]:
+        ax.axhline(y=reference, c='#999999', lw=0.5)
+
+
 def bayes_poll_aggregation_plots(df, 
                                  fit, 
                                  first_day, 
@@ -380,10 +388,7 @@ def bayes_poll_aggregation_plots(df,
             rotation=90, ha='left', va='center',
             fontsize=14)
 
-    BENCHMARK = 50
-    span = ax.get_ylim()
-    if span[0] <= BENCHMARK <= span[1]:
-        ax.axhline(y=BENCHMARK, c='#999999', lw=0.5)
+    add_h_refence(ax, reference=50)
 
     markers = ['x', '+', '1', '2', '3', '4', '<', '>', '^', 'v', 'o', 's', '*', ]
     for i, brand in enumerate(sorted(df[firm_column].unique())):
