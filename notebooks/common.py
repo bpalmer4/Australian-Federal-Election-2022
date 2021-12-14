@@ -336,20 +336,10 @@ def bayes_poll_aggregation(df,
     return fit, first_day, brand_map
 
 
-def bayes_poll_aggregation_plots(df, 
-                                 fit, 
-                                 first_day, 
-                                 brand_map,
-                              poll_column,
-                              date_column,
-                              firm_column,
-                                 party,
-                                 title,
-                                 line_color,
-                                 point_color,
-                                s_args):
-    
-    # This is a bit of a hack, and certainly too long a function
+def bayes_poll_aggregation_plots(df, fit, first_day, brand_map,
+                                 poll_column, date_column, firm_column,
+                                 party, title, line_color, point_color,
+                                 **kwargs):
     
     # a framework for quantifying where the samples lie
     quants = [0.005, 0.025, 0.100, 0.250, 0.500, 0.750, 0.900, 0.975, 0.995]
@@ -365,15 +355,8 @@ def bayes_poll_aggregation_plots(df,
     results_df = fit.to_frame()
     
     # Get the daily hidden vote share data
-    hvs = (
-        results_df[
-            results_df.columns[
-                results_df.columns.str.contains('hidden_vote_share')
-            ]
-        ]
-    )
-    hvs.columns = pd.date_range(start=first_day, freq='D', 
-                                periods=len(hvs.columns))
+    hvs = results_df[results_df.columns[results_df.columns.str.contains('hidden_vote_share')]]
+    hvs.columns = pd.date_range(start=first_day, freq='D', periods=len(hvs.columns))
     hvs = hvs.quantile(quants)
     
     # plot this daily hidden vote share
@@ -385,39 +368,19 @@ def bayes_poll_aggregation_plots(df,
         lowpoint = hvs.loc[low]
         highpoint = hvs.loc[high]
         ax.fill_between(x=lowpoint.index, y1=lowpoint, y2=highpoint,
-                        color=line_color, alpha = alpha,label=x,)
+                        color=line_color, alpha = alpha, label=x,)
         alpha += 0.075
-    
-    ax.plot(hvs.columns, hvs.loc[0.500], 
-            color=line_color, lw=1, label='Median')
+    ax.plot(hvs.columns, hvs.loc[0.500], color=line_color, lw=1, label='Median')
 
-    # annotate end-point median to one devimal place ...
-    ax.text(hvs.columns[-1] + pd.Timedelta(days=10), 
-            hvs.loc[0.500][-1], 
-            f'{hvs.loc[0.500].round(1)[-1]}',
-            rotation=90, ha='left', va='center',
-            fontsize=14)
-
+    annotate_endpoint(ax, series=hvs.loc[0.500], end=None)
     add_h_refence(ax, reference=50)
-
-    markers = ['x', '+', '1', '2', '3', '4', '<', '>', '^', 'v', 'o', 's', '*', ]
-    for i, brand in enumerate(sorted(df[firm_column].unique())):
-        subset = df[df[firm_column] == brand].copy()
-        a = subset[date_column]
-        b = subset[poll_column]
-        #print('DEBUG', len(subset), len(a), len(b), type(a), type(b), a, b)
-        #display(subset)
-        if not len(subset):
-            continue # ignore empty subsets
-        ax.scatter(a, b, marker=markers[i], label=brand, color=point_color)
-
+    add_data_points_by_pollster(ax, df, poll_column, point_color)
     ax.legend(loc='best', ncol=2)
     
     plot_finalise(ax, 
                   title=f'{party} {title}',
                   ylabel=f'Per cent vote share for {party}',
-                  **s_args,
-                 )
+                  **kwargs, )
 
     # get the house effects data
     house_effects = results_df[results_df.columns[results_df.columns.str.contains('houseEffect')]]
@@ -460,10 +423,9 @@ def bayes_poll_aggregation_plots(df,
     print(house_effects.loc[0.500])
     ax.legend(loc='best')
 
-    plot_finalise(ax, 
-                         title=f'{party} {title} (House Effects)',
-                         xlabel=f'Percentage Points (towards {party})',
-                         **s_args, )
+    plot_finalise(ax, title=f'{party} {title} (House Effects)',
+                  xlabel=f'Percentage Points (towards {party})',
+                  **kwargs, )
     
     
 # --- PLOTTING ---
@@ -533,7 +495,7 @@ def add_summary_line(ax, df, column, l_color, function, argument, label=None):
 
 def plot_finalise(ax, title=None, xlabel=None, ylabel=None, 
                   lfooter=None, rfooter='marktheballot.blogspot.com',
-                  location='../charts/'):
+                  location='../charts/', **kwargs):
     """Complete and save a plot image"""
     
     # annotate the plot
