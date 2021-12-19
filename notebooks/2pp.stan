@@ -6,9 +6,6 @@ data {
     int<lower=1> n_days;
     int<lower=1> n_houses;
     
-    // factor to have the model working in unit scale around zero
-    real<lower=0,upper=100> centre_offset; 
-    
     // assumed standard deviation for all polls
     real<lower=0> pseudoSampleSigma;
     
@@ -19,7 +16,8 @@ data {
 }
 
 transformed data {
-    vector<lower=-50,upper=100> [n_polls] yy = y - centre_offset;
+    real<lower=0,upper=100> centre_offset = mean(y);
+    vector<lower=-100,upper=100> [n_polls] yy = y - centre_offset;
     real sigma = 0.15; // day-to-day std deviation in percentage points 
 }
 
@@ -36,7 +34,7 @@ transformed parameters {
 
 model {
     // -- temporal model [this is the hidden state space model]
-    hidden_vote_share[1] ~ cauchy(0, 10); // PRIOR (reasonably uninformative)
+    hidden_vote_share[1] ~ cauchy(centre_offset, 10); // PRIOR (reasonably uninformative)
     hidden_vote_share[2:n_days] ~ normal(hidden_vote_share[1:(n_days-1)], sigma);
     
     // -- house effects model

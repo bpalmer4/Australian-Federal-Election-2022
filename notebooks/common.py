@@ -8,10 +8,35 @@ import bs4
 import re
 import statsmodels.api as sm
 import stan # install with pip - conda is problematic on the M1 MBP
+import os
+import time
+import datetime
 
 from typing import List
 
 
+# --- WARNINGS ---
+
+_warnings = []
+
+def warn(message):
+    print(message)
+    _warnings.append(message)
+
+
+def print_warnings():
+    for i, w in enumerate(_warnings):
+        print(f'{i+1:3d}: {w}')
+
+
+def check_file_current(filename, message):
+    file_status = os.stat(filename)
+    modified_date = datetime.date(*time.localtime(file_status.st_mtime)[:3])
+    today = datetime.date.today()
+    if modified_date != today:
+        warn(f'{filename}: File looks old. ' + message)
+
+        
 # --- WEB BASED DATA CAPTURE --
 
 def get_url_text(url: str):
@@ -216,22 +241,41 @@ def flatten_col_names(columns: pd.Index) -> List[str]:
     return [' '.join(col).strip() for col in columns.values]
 
 
-# --- STATISTICAL ---
+# --- POLL AGGREGATION ---
+
+# Calculate an exponentially weighted average
+def calculate_ewm(series, times, halflife):
+    """Calculate an exponentially weighted mean for a series."""
+    
+    # sanity checks
+    assert len(series) == len(times)
+    assert series.notna().all()
+    assert times.notna().all()
+    
+    return (
+        series
+        .ewm(halflife=halflife, times=times)
+        .mean()
+    )
+
 
 # Calulcate a LOWESS regression
-def get_lowess(votes, dates, period=60):
+def calculate_lowess(series, times, period):
 
-    day = (dates - dates.min()) / pd.Timedelta(days=1) + 1
+    # sanity checks
+    assert len(series) == len(times)
+
+    day = (times - times.min()) / pd.Timedelta(days=1) + 1
     frac = period / day.max()
     lowess = sm.nonparametric.lowess(
-        endog=votes, exog=day, # y, x ...
+        endog=series, exog=day, # y, x ...
         frac=frac, is_sorted=True)
 
     lowess = {int(x[0]): x[1] for x in lowess}
     lowess = day.map(lowess).interpolate()
-    lowess.index = dates
+    lowess.index = times
 
-    return lowess, period
+    return lowess
 
 
 # Bayesian aggregation of vote time-series data
@@ -272,7 +316,6 @@ def bayes_poll_aggregation(df,
         'n_polls': len(df),
         'n_days': int(df['_Day'].max()),
         'n_houses': int(df['_House'].max()),
-        'centre_offset': df[poll_column].mean(),
 
         'pseudoSampleSigma': pseudoSampleSigma,
     
@@ -293,20 +336,10 @@ def bayes_poll_aggregation(df,
     return fit, first_day, brand_map
 
 
-def bayes_poll_aggregation_plots(df, 
-                                 fit, 
-                                 first_day, 
-                                 brand_map,
-                              poll_column,
-                              date_column,
-                              firm_column,
-                                 party,
-                                 title,
-                                 line_color,
-                                 point_color,
-                                s_args):
-    
-    # This is a bit of a hack, and certainly too long a function
+def bayes_poll_aggregation_plots(df, fit, first_day, brand_map,
+                                 poll_column, date_column, firm_column,
+                                 party, title, line_color, point_color,
+                                 **kwargs):
     
     # a framework for quantifying where the samples lie
     quants = [0.005, 0.025, 0.100, 0.250, 0.500, 0.750, 0.900, 0.975, 0.995]
@@ -322,15 +355,8 @@ def bayes_poll_aggregation_plots(df,
     results_df = fit.to_frame()
     
     # Get the daily hidden vote share data
-    hvs = (
-        results_df[
-            results_df.columns[
-                results_df.columns.str.contains('hidden_vote_share')
-            ]
-        ]
-    )
-    hvs.columns = pd.date_range(start=first_day, freq='D', 
-                                periods=len(hvs.columns))
+    hvs = results_df[results_df.columns[results_df.columns.str.contains('hidden_vote_share')]]
+    hvs.columns = pd.date_range(start=first_day, freq='D', periods=len(hvs.columns))
     hvs = hvs.quantile(quants)
     
     # plot this daily hidden vote share
@@ -342,42 +368,19 @@ def bayes_poll_aggregation_plots(df,
         lowpoint = hvs.loc[low]
         highpoint = hvs.loc[high]
         ax.fill_between(x=lowpoint.index, y1=lowpoint, y2=highpoint,
-                        color=line_color, alpha = alpha,label=x,)
+                        color=line_color, alpha = alpha, label=x,)
         alpha += 0.075
-    
-    ax.plot(hvs.columns, hvs.loc[0.500], 
-            color=line_color, lw=1, label='Median')
+    ax.plot(hvs.columns, hvs.loc[0.500], color=line_color, lw=1, label='Median')
 
-    # annotate end-point median to one devimal place ...
-    ax.text(hvs.columns[-1] + pd.Timedelta(days=10), 
-            hvs.loc[0.500][-1], 
-            f'{hvs.loc[0.500].round(1)[-1]}',
-            rotation=90, ha='left', va='center',
-            fontsize=14)
-
-    BENCHMARK = 50
-    span = ax.get_ylim()
-    if span[0] <= BENCHMARK <= span[1]:
-        ax.axhline(y=BENCHMARK, c='#555555', lw=1.5)
-
-    markers = ['x', '+', '1', '2', '3', '4', '<', '>', '^', 'v', 'o', 's', '*', ]
-    for i, brand in enumerate(sorted(df[firm_column].unique())):
-        subset = df[df[firm_column] == brand].copy()
-        a = subset[date_column]
-        b = subset[poll_column]
-        #print('DEBUG', len(subset), len(a), len(b), type(a), type(b), a, b)
-        #display(subset)
-        if not len(subset):
-            continue # ignore empty subsets
-        ax.scatter(a, b, marker=markers[i], label=brand, color='#333333')
-
+    annotate_endpoint(ax, series=hvs.loc[0.500], end=None)
+    add_h_refence(ax, reference=50)
+    add_data_points_by_pollster(ax, df, poll_column, point_color)
     ax.legend(loc='best', ncol=2)
     
     plot_finalise(ax, 
-                         title=f'{party} {title}',
-                         ylabel=f'Per cent vote share for {party}',
-                         **s_args,
-                        )
+                  title=f'{party} {title}',
+                  ylabel=f'Per cent vote share for {party}',
+                  **kwargs, )
 
     # get the house effects data
     house_effects = results_df[results_df.columns[results_df.columns.str.contains('houseEffect')]]
@@ -420,18 +423,22 @@ def bayes_poll_aggregation_plots(df,
     print(house_effects.loc[0.500])
     ax.legend(loc='best')
 
-    plot_finalise(ax, 
-                         title=f'{party} {title} (House Effects)',
-                         xlabel=f'Percentage Points (towards {party})',
-                         **s_args, )
+    plot_finalise(ax, title=f'{party} {title} (House Effects)',
+                  xlabel=f'Percentage Points (towards {party})',
+                  **kwargs, )
     
     
 # --- PLOTTING ---
 
 COLOR_COALITION = 'darkblue'
-COLOR_LABOR = '#dd0000'
+COLOR_LABOR = 'darkred'
 COLOR_OTHER = 'darkorange'
 COLOR_GREEN = 'darkgreen'
+
+P_COLOR_COALITION = '#0000dd'
+P_COLOR_LABOR = '#dd0000'
+P_COLOR_OTHER = 'orange'
+P_COLOR_GREEN = 'green'
 
 
 def initiate_plot():
@@ -441,9 +448,54 @@ def initiate_plot():
     return fig, ax
 
 
+def annotate_endpoint(ax, series:pd.Series, end=None):
+    """Annotate the endpoint of a series on a plot."""
+    xlim = ax.get_xlim() 
+    span = xlim[1] - xlim[0]
+    x = xlim[1] - 0.005 * span # Based on 2% margins in initiate_plot()
+    x = x if end is None else end
+    ax.text(x, series.iloc[-1], 
+            f'{round(series.iloc[-1], 1)}',
+            ha='left', va='center', #rotation=90, 
+            fontsize=10)
+
+
+def add_data_points_by_pollster(ax, df, column, p_color, 
+                                brand_col='Brand', 
+                                date_col='Mean Date', no_label=False):
+    """Add individual poll results to the plot."""
+    markers = ['v', '^', '<', '>', 'o', '^', '1', '2', '3', '4', 's', 'p', 'h', 'D']
+    for i, brand in enumerate(sorted(df[brand_col].unique())):
+        poll = df[df[brand_col] == brand]
+        series = (
+            poll[column].sum(axis=1, skipna=True) if type(column) is list 
+            else poll[column]
+        )
+        label = None if no_label else brand
+        ax.scatter(poll[date_col], series, marker=markers[i], 
+                   c=p_color, label=label)
+
+
+def add_h_refence(ax, reference):
+    """Add a horizontal reference line."""
+    span = ax.get_ylim() 
+    if span[0] <= reference <= span[1]:
+        ax.axhline(y=reference, c='#999999', lw=0.5)
+
+
+def add_summary_line(ax, df, column, l_color, function, argument, label=None):
+    """Add a line summary to the plot as calculated by function()"""
+    series = df[column].sum(axis=1, skipna=True) if type(column) is list else df[column]
+    times = df['Mean Date']
+    summary = function(series, times, argument)
+    ax.plot(times, summary, lw=2.5, c=l_color, label=label)
+    add_h_refence(ax, reference=50)
+    annotate_endpoint(ax, series=summary, end=times.iloc[-1]+pd.Timedelta(days=5))
+
+
 def plot_finalise(ax, title=None, xlabel=None, ylabel=None, 
                   lfooter=None, rfooter='marktheballot.blogspot.com',
-                  location='../charts/'):
+                  location='../charts/', **kwargs):
     """Complete and save a plot image"""
     
     # annotate the plot
@@ -475,3 +527,33 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
     plt.close()
     
     
+def plot_summary_line(df, column, p_color, l_color, title,
+                      function, argument, label, lfooter):
+    """Generate a summary line plot, where the line is generated by function()"""
+    fig, ax = initiate_plot()
+    add_data_points_by_pollster(ax, df, column, p_color)
+    add_summary_line(ax, df, column, l_color, function, argument, label)
+    ax.legend(loc='best')
+    plot_finalise(ax, 
+                     ylabel='Per cent',
+                     title=title, 
+                     lfooter=lfooter)    
+                     
+                     
+def plot_summary_line_by_pollster(df, column, title,
+                                  function, argument, lfooter):
+    """For each pollster, plot a summary line calculated with function()"""
+    MINIMUM_POLLS_REQUIRED = 2 # two polls needed for a line
+    fig, ax = initiate_plot()
+    for i, pollster in enumerate(sorted(df['Brand'].unique())):
+        polls = df[df['Brand'] == pollster].copy()
+        if len(polls) <= MINIMUM_POLLS_REQUIRED:
+            continue
+        add_data_points_by_pollster(ax, df=polls, column=column, p_color=None)
+        add_summary_line(ax, df=polls, column=column, l_color=None, 
+                         function=function, argument=argument)
+    ax.legend(loc='best')
+    plot_finalise(ax, 
+                  ylabel='Per cent',
+                  title=title, 
+                  lfooter=lfooter)
