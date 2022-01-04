@@ -292,21 +292,21 @@ P_COLOR_GREEN = 'green'
 
 def initiate_plot():
     """Get a matplotlib figure and axes instance."""
-    fig, ax = plt.subplots(figsize=(9, 4.5))
+    fig, ax = plt.subplots(figsize=(9, 4.5), constrained_layout=False)
     ax.margins(0.02)
     return fig, ax
 
 
-def annotate_endpoint(ax, series:pd.Series, end=None):
+def annotate_endpoint(ax, series: pd.Series, end=None):
     """Annotate the endpoint of a series on a plot."""
     xlim = ax.get_xlim() 
     span = xlim[1] - xlim[0]
-    x = xlim[1] - 0.005 * span # Based on 2% margins in initiate_plot()
+    x = xlim[1] - 0.0075 * span # Based on 2% margins in initiate_plot()
     x = x if end is None else end
     ax.text(x, series.iloc[-1], 
             f'{round(series.iloc[-1], 1)}',
-            ha='left', va='center', #rotation=90, 
-            fontsize=10)
+            ha='left', va='center', rotation=90, 
+            fontsize=12)
 
 
 def add_data_points_by_pollster(ax, df, column, p_color, 
@@ -322,7 +322,7 @@ def add_data_points_by_pollster(ax, df, column, p_color,
         )
         label = None if no_label else brand
         ax.scatter(poll[date_col], series, marker=markers[i], 
-                   c=p_color, label=label)
+                   c=p_color, s=10, label=label)
 
 
 def add_h_refence(ax, reference):
