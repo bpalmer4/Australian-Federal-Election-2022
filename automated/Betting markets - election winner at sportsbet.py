@@ -5,7 +5,10 @@
 # 
 # Note: this notebook is for ease of testing. Convert to a python file and move to the automated directory.
 # 
-# ```ipython nbconvert --to python "Betting markets - election winner at sportsbet.ipynb"
+# To do this ...
+# ```
+# ipython nbconvert --to python "Betting markets - election winner at sportsbet.ipynb"
+# chmod 700 "Betting markets - election winner at sportsbet.py"
 # mv "Betting markets - election winner at sportsbet.py" ../automated ```
 
 # <h1>Table of Contents<span class="tocSkip"></span></h1>
@@ -98,14 +101,21 @@ with open(FILE, 'a') as file:
 
 # ## Final sanity check
 
-# In[6]:
+# In[7]:
 
 
 expected_names = [
+    'Any Other',
     'Date',
     'Labor Majority',
     'Labor Minority',
     'Liberal/National Coalition Majority',
-    'Liberal/National Coalition Minority']
-assert column_names == expected_names
+    'Liberal/National Coalition Minority',]
+assert column_names == expected_names, column_names
+
+
+# In[ ]:
+
+
+
 
