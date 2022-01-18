@@ -1,24 +1,140 @@
-Any Other,Date,Labor Majority,Labor Minority,Liberal/National Coalition Majority,Liberal/National Coalition Minority
--,2021-12-19 15:48:37.777169,2.25,3.50,3.80,3.30
--,2021-12-19 15:57:07.267979,2.25,3.50,3.80,3.30
--,2021-12-20 15:21:09.307461,2.25,3.50,3.80,3.30
--,2021-12-20 15:21:52.853837,2.25,3.50,3.80,3.30
--,2021-12-20 15:22:37.668030,2.25,3.50,3.80,3.30
--,2021-12-26 22:17:38.651117,2.50,3.40,3.75,3.25
--,2021-12-27 11:45:37.011228,2.50,3.40,3.75,3.25
--,2021-12-28 11:45:42.328316,2.50,3.40,3.75,3.25
--,2021-12-29 11:45:42.234137,2.50,3.40,3.75,3.25
--,2021-12-30 11:45:42.696247,2.50,3.40,3.75,3.25
--,2021-12-31 11:45:43.371157,2.50,3.40,3.75,3.25
--,2022-01-01 11:45:50.619419,2.50,3.40,3.75,3.25
--,2022-01-02 11:45:37.991688,2.50,3.40,3.75,3.25
--,2022-01-03 11:45:27.876117,2.50,3.40,3.75,3.25
--,2022-01-03 22:16:46.540212,2.50,3.40,3.75,3.25
--,2022-01-04 11:45:37.849944,2.50,3.40,3.75,3.25
-51.00,2022-01-05 11:45:39.216865,2.25,3.75,4.00,3.50
-51.00,2022-01-06 11:45:41.875163,2.25,3.75,4.00,3.50
-51.00,2022-01-07 11:45:44.505996,2.25,3.75,4.00,3.50
-51.00,2022-01-08 11:45:39.786456,2.25,3.75,4.00,3.50
-51.00,2022-01-09 11:45:40.779899,2.25,3.75,4.00,3.50
-51.00,2022-01-10 07:36:02.378900,2.25,3.75,4.00,3.50
-51.00,2022-01-10 07:43:56.290644,2.25,3.75,4.00,3.50
+datetime,variable,value
+2021-12-19 15:48:37.777169,Labor Majority,2.25
+2021-12-19 15:48:37.777169,Liberal/National Coalition Minority,3.3
+2021-12-19 15:48:37.777169,Liberal/National Coalition Majority,3.8
+2021-12-19 15:48:37.777169,Labor Minority,3.5
+2021-12-19 15:57:07.267979,Liberal/National Coalition Minority,3.3
+2021-12-19 15:57:07.267979,Labor Majority,2.25
+2021-12-19 15:57:07.267979,Liberal/National Coalition Majority,3.8
+2021-12-19 15:57:07.267979,Labor Minority,3.5
+2021-12-20 15:21:09.307461,Liberal/National Coalition Majority,3.8
+2021-12-20 15:21:09.307461,Labor Majority,2.25
+2021-12-20 15:21:09.307461,Labor Minority,3.5
+2021-12-20 15:21:09.307461,Liberal/National Coalition Minority,3.3
+2021-12-20 15:21:52.853837,Liberal/National Coalition Majority,3.8
+2021-12-20 15:21:52.853837,Labor Majority,2.25
+2021-12-20 15:21:52.853837,Liberal/National Coalition Minority,3.3
+2021-12-20 15:21:52.853837,Labor Minority,3.5
+2021-12-20 15:22:37.668030,Liberal/National Coalition Minority,3.3
+2021-12-20 15:22:37.668030,Labor Majority,2.25
+2021-12-20 15:22:37.668030,Labor Minority,3.5
+2021-12-20 15:22:37.668030,Liberal/National Coalition Majority,3.8
+2021-12-26 22:17:38.651117,Labor Majority,2.5
+2021-12-26 22:17:38.651117,Labor Minority,3.4
+2021-12-26 22:17:38.651117,Liberal/National Coalition Majority,3.75
+2021-12-26 22:17:38.651117,Liberal/National Coalition Minority,3.25
+2021-12-27 11:45:37.011228,Liberal/National Coalition Minority,3.25
+2021-12-27 11:45:37.011228,Liberal/National Coalition Majority,3.75
+2021-12-27 11:45:37.011228,Labor Minority,3.4
+2021-12-27 11:45:37.011228,Labor Majority,2.5
+2021-12-28 11:45:42.328316,Liberal/National Coalition Majority,3.75
+2021-12-28 11:45:42.328316,Labor Majority,2.5
+2021-12-28 11:45:42.328316,Labor Minority,3.4
+2021-12-28 11:45:42.328316,Liberal/National Coalition Minority,3.25
+2021-12-29 11:45:42.234137,Labor Minority,3.4
+2021-12-29 11:45:42.234137,Labor Majority,2.5
+2021-12-29 11:45:42.234137,Liberal/National Coalition Majority,3.75
+2021-12-29 11:45:42.234137,Liberal/National Coalition Minority,3.25
+2021-12-30 11:45:42.696247,Labor Minority,3.4
+2021-12-30 11:45:42.696247,Labor Majority,2.5
+2021-12-30 11:45:42.696247,Liberal/National Coalition Majority,3.75
+2021-12-30 11:45:42.696247,Liberal/National Coalition Minority,3.25
+2021-12-31 11:45:43.371157,Labor Majority,2.5
+2021-12-31 11:45:43.371157,Liberal/National Coalition Majority,3.75
+2021-12-31 11:45:43.371157,Labor Minority,3.4
+2021-12-31 11:45:43.371157,Liberal/National Coalition Minority,3.25
+2022-01-01 11:45:50.619419,Liberal/National Coalition Minority,3.25
+2022-01-01 11:45:50.619419,Labor Majority,2.5
+2022-01-01 11:45:50.619419,Labor Minority,3.4
+2022-01-01 11:45:50.619419,Liberal/National Coalition Majority,3.75
+2022-01-02 11:45:37.991688,Labor Majority,2.5
+2022-01-02 11:45:37.991688,Liberal/National Coalition Majority,3.75
+2022-01-02 11:45:37.991688,Liberal/National Coalition Minority,3.25
+2022-01-02 11:45:37.991688,Labor Minority,3.4
+2022-01-03 11:45:27.876117,Liberal/National Coalition Majority,3.75
+2022-01-03 11:45:27.876117,Liberal/National Coalition Minority,3.25
+2022-01-03 11:45:27.876117,Labor Minority,3.4
+2022-01-03 11:45:27.876117,Labor Majority,2.5
+2022-01-03 22:16:46.540212,Liberal/National Coalition Majority,3.75
+2022-01-03 22:16:46.540212,Labor Majority,2.5
+2022-01-03 22:16:46.540212,Liberal/National Coalition Minority,3.25
+2022-01-03 22:16:46.540212,Labor Minority,3.4
+2022-01-04 11:45:37.849944,Liberal/National Coalition Minority,3.25
+2022-01-04 11:45:37.849944,Liberal/National Coalition Majority,3.75
+2022-01-04 11:45:37.849944,Labor Minority,3.4
+2022-01-04 11:45:37.849944,Labor Majority,2.5
+2022-01-05 11:45:39.216865,Liberal/National Coalition Minority,3.5
+2022-01-05 11:45:39.216865,Liberal/National Coalition Majority,4.0
+2022-01-05 11:45:39.216865,Labor Majority,2.25
+2022-01-05 11:45:39.216865,Labor Minority,3.75
+2022-01-05 11:45:39.216865,Any Other,51.0
+2022-01-06 11:45:41.875163,Liberal/National Coalition Minority,3.5
+2022-01-06 11:45:41.875163,Labor Majority,2.25
+2022-01-06 11:45:41.875163,Any Other,51.0
+2022-01-06 11:45:41.875163,Labor Minority,3.75
+2022-01-06 11:45:41.875163,Liberal/National Coalition Majority,4.0
+2022-01-07 11:45:44.505996,Any Other,51.0
+2022-01-07 11:45:44.505996,Liberal/National Coalition Majority,4.0
+2022-01-07 11:45:44.505996,Labor Majority,2.25
+2022-01-07 11:45:44.505996,Labor Minority,3.75
+2022-01-07 11:45:44.505996,Liberal/National Coalition Minority,3.5
+2022-01-08 11:45:39.786456,Liberal/National Coalition Minority,3.5
+2022-01-08 11:45:39.786456,Labor Majority,2.25
+2022-01-08 11:45:39.786456,Liberal/National Coalition Majority,4.0
+2022-01-08 11:45:39.786456,Any Other,51.0
+2022-01-08 11:45:39.786456,Labor Minority,3.75
+2022-01-09 11:45:40.779899,Any Other,51.0
+2022-01-09 11:45:40.779899,Labor Majority,2.25
+2022-01-09 11:45:40.779899,Labor Minority,3.75
+2022-01-09 11:45:40.779899,Liberal/National Coalition Majority,4.0
+2022-01-09 11:45:40.779899,Liberal/National Coalition Minority,3.5
+2022-01-10 07:36:02.378900,Liberal/National Coalition Minority,3.5
+2022-01-10 07:36:02.378900,Labor Majority,2.25
+2022-01-10 07:36:02.378900,Any Other,51.0
+2022-01-10 07:36:02.378900,Liberal/National Coalition Majority,4.0
+2022-01-10 07:36:02.378900,Labor Minority,3.75
+2022-01-10 07:43:56.290644,Labor Minority,3.75
+2022-01-10 07:43:56.290644,Liberal/National Coalition Majority,4.0
+2022-01-10 07:43:56.290644,Labor Majority,2.25
+2022-01-10 07:43:56.290644,Any Other,51.0
+2022-01-10 07:43:56.290644,Liberal/National Coalition Minority,3.5
+2022-01-10 11:45:36.103995,Liberal/National Coalition Minority,3.5
+2022-01-10 11:45:36.103995,Labor Majority,2.25
+2022-01-10 11:45:36.103995,Labor Minority,3.75
+2022-01-10 11:45:36.103995,Liberal/National Coalition Majority,4.0
+2022-01-11 11:46:17.015376,Labor Minority,3.75
+2022-01-11 11:46:17.015376,Liberal/National Coalition Minority,3.5
+2022-01-11 11:46:17.015376,Liberal/National Coalition Majority,4.0
+2022-01-11 11:46:17.015376,Labor Majority,2.25
+2022-01-12 11:45:40.536849,Labor Majority,2.25
+2022-01-12 11:45:40.536849,Labor Minority,3.75
+2022-01-12 11:45:40.536849,Liberal/National Coalition Minority,3.5
+2022-01-12 11:45:40.536849,Liberal/National Coalition Majority,4.0
+2022-01-13 11:45:45.266335,Liberal/National Coalition Minority,3.5
+2022-01-13 11:45:45.266335,Labor Minority,3.75
+2022-01-13 11:45:45.266335,Labor Majority,2.25
+2022-01-13 11:45:45.266335,Liberal/National Coalition Majority,4.0
+2022-01-14 11:45:49.934191,Liberal/National Coalition Majority,3.75
+2022-01-14 11:45:49.934191,Labor Minority,4.0
+2022-01-14 11:45:49.934191,Liberal/National Coalition Minority,5.0
+2022-01-14 11:45:49.934191,Labor Majority,2.0
+2022-01-15 11:45:46.184773,Liberal/National Coalition Majority,3.75
+2022-01-15 11:45:46.184773,Liberal/National Coalition Minority,5.0
+2022-01-15 11:45:46.184773,Labor Minority,4.0
+2022-01-15 11:45:46.184773,Labor Majority,2.0
+2022-01-16 11:45:44.876088,Liberal/National Coalition Majority,3.75
+2022-01-16 11:45:44.876088,Labor Majority,2.0
+2022-01-16 11:45:44.876088,Liberal/National Coalition Minority,5.0
+2022-01-16 11:45:44.876088,Labor Minority,4.0
+2022-01-17 11:45:47.095072,Labor Minority,4.0
+2022-01-17 11:45:47.095072,Liberal/National Coalition Minority,5.0
+2022-01-17 11:45:47.095072,Liberal/National Coalition Majority,3.75
+2022-01-17 11:45:47.095072,Labor Majority,2.0
+2022-01-18 11:45:41.870074,Liberal/National Coalition Minority,5.5
+2022-01-18 11:45:41.870074,Labor Minority,4.3
+2022-01-18 11:45:41.870074,Labor Majority,1.75
+2022-01-18 11:45:41.870074,Liberal/National Coalition Majority,4.0
+2022-01-18 12:28:56.826430,Liberal/National Coalition Majority,4.00
+2022-01-18 12:28:56.826430,Liberal/National Coalition Minority,5.50
+2022-01-18 12:28:56.826430,Labor Majority,1.75
+2022-01-18 12:28:56.826430,Labor Minority,4.30

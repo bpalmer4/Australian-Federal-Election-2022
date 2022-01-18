@@ -82,36 +82,32 @@ found = {}
 for c in odds:
     match = re.search(comp_pattern, c.text)
     found[match[1]] = match[2]
-found['Date'] = datetime.datetime.now()
+#found['Date'] = datetime.datetime.now()
 
-
-# ## Append this data to a CSV file
 
 # In[5]:
 
 
-# save to file
-FILE = '../historical-data/sportsbet-2022-outcome.csv'
-column_names = sorted(found.keys())
-with open(FILE, 'a') as file:
-    dictwriter_object = DictWriter(file, fieldnames=column_names)
-    dictwriter_object.writerow(found)
-    file.close()
+# long format assert False
 
 
-# ## Final sanity check
+# ## Append this data to a CSV file
+
+# In[6]:
+
+
+# long format
+df = pd.DataFrame([found.keys(), found.values()], index=['variable', 'value']).T
+df.index =np.repeat(datetime.datetime.now(), len(df))
+df.index.name = 'datetime'
+
 
 # In[7]:
 
 
-expected_names = [
-    'Any Other',
-    'Date',
-    'Labor Majority',
-    'Labor Minority',
-    'Liberal/National Coalition Majority',
-    'Liberal/National Coalition Minority',]
-assert column_names == expected_names, column_names
+# save to file
+FILE = '../historical-data/sportsbet-2022-outcome.csv'
+df.to_csv(FILE, mode='a', index=True, header=False)
 
 
 # In[ ]:
