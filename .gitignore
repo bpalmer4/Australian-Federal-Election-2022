@@ -15,4 +15,4 @@ __pycache__/
 charts/**
 data/**
 notebooks/build
-automated/*.txt
+automated/**
