@@ -369,8 +369,11 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
     ax.figure.tight_layout(pad=1.1)    
     
     if title is not None:
+        file_stem = f'{location}{title}'
+        if 'save_suffix' in kwargs:
+            file_stem += '-' + kwargs['save_suffix']
         pathlib.Path(location).mkdir(parents=True, exist_ok=True)
-        ax.figure.savefig(location+title+'.png', dpi=300)
+        ax.figure.savefig(f'{file_stem}.png', dpi=300)
     
     # close
     plt.show()
