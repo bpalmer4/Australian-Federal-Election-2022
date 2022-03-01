@@ -197,6 +197,9 @@ def get_mean_date(tokens: List[str]) -> pd.Timestamp:
 
 def tokenise_dates(dates: pd.Series) -> pd.Series:
     """Return the date as a list of tokens."""
+    if type(dates) is pd.DataFrame:
+        dates = dates[dates.columns[0]] # WTF?
+    
     return (
         dates
         .str.replace(endash, hyphen)
@@ -211,7 +214,7 @@ def middle_date(t: pd.DataFrame) -> pd.DataFrame:
     """Get the middle date in the date range, into column 'Mean Date'."""
     
     # assumes dates in strings are ordered from first to last
-    tokens = tokenise_dates(t['Date'])
+    tokens = tokenise_dates(t['Date']) 
     t['Mean Date'] = tokens.apply(get_mean_date).astype('datetime64[ns]')
     return t
 
