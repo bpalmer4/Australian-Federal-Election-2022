@@ -263,7 +263,6 @@ def calculate_ewm(series, times, halflife):
 
 # Calulcate a LOWESS regression
 def calculate_lowess(series, times, period):
-
     # sanity checks
     assert len(series) == len(times)
 
