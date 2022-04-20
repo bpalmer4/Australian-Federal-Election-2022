@@ -316,7 +316,7 @@ def add_data_points_by_pollster(ax, df, column, p_color,
                                 brand_col='Brand', 
                                 date_col='Mean Date', no_label=False):
     """Add individual poll results to the plot."""
-    markers = ['v', '^', '<', '>', 'o', '^', '1', '2', '3', '4', 's', 'p', 'h', 'D']
+    markers = ['v', '^', '<', '>', 'o', 's', 'p', 'h', 'D', '1', '2', '3', '4', ]
     for i, brand in enumerate(sorted(df[brand_col].unique())):
         poll = df[df[brand_col] == brand]
         series = (
