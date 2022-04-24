@@ -291,6 +291,8 @@ P_COLOR_LABOR = '#dd0000'
 P_COLOR_OTHER = 'orange'
 P_COLOR_GREEN = 'green'
 
+MARKERS = ['v', '^', '<', '>', 'o', 's', 'p', 'h', 'D', '1', '2', '3', '4', ]
+
 
 def initiate_plot():
     """Get a matplotlib figure and axes instance."""
@@ -314,9 +316,8 @@ def annotate_endpoint(ax, series: pd.Series, end=None, rot=90):
 
 def add_data_points_by_pollster(ax, df, column, p_color, 
                                 brand_col='Brand', 
-                                date_col='Mean Date', no_label=False):
+                                date_col='Mean Date', no_label=False, marker=None):
     """Add individual poll results to the plot."""
-    markers = ['v', '^', '<', '>', 'o', 's', 'p', 'h', 'D', '1', '2', '3', '4', ]
     for i, brand in enumerate(sorted(df[brand_col].unique())):
         poll = df[df[brand_col] == brand]
         series = (
@@ -324,7 +325,8 @@ def add_data_points_by_pollster(ax, df, column, p_color,
             else poll[column]
         )
         label = None if no_label else brand
-        ax.scatter(poll[date_col], series, marker=markers[i], 
+        m = marker if marker is not None else MARKERS[i]
+        ax.scatter(poll[date_col], series, marker=m, 
                    c=p_color, s=20, label=label)
 
 
@@ -404,9 +406,10 @@ def plot_summary_line_by_pollster(df, column, title,
         polls = df[df['Brand'] == pollster].copy()
         if len(polls) <= MINIMUM_POLLS_REQUIRED:
             continue
-        add_data_points_by_pollster(ax, df=polls, column=column, p_color=None)
         add_summary_line(ax, df=polls, column=column, l_color=None, 
                          function=function, argument=argument, rot=rot)
+        add_data_points_by_pollster(ax, df=polls, column=column, p_color=None, marker=MARKERS[i])
+
     ax.legend(loc='best')
     plot_finalise(ax, 
                   ylabel='Per cent',
