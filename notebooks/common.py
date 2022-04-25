@@ -35,14 +35,25 @@ def check_file_current(filename, message):
     if modified_date != today:
         warn(f'{filename}: File looks old. ' + message)
 
-        
+# --- WEB SCRAPING -=-
+
 # --- WEB BASED DATA CAPTURE --
 
 def get_url_text(url: str):
-    response = requests.get(url)
+    headers = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Host': 'en.wikipedia.org',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'X-CSRF-Token': 'undefined',
+        'Discourse-Present': 'true',
+        'X-Requested-With': 'XMLHttpRequest',
+    }
+    response = requests.get(url, headers=headers)
     assert(response.status_code == 200) # successful retrieval
     return response.text
-
 
 def get_tables(text):
     soup = bs4.BeautifulSoup(text, features="lxml")
@@ -268,6 +279,9 @@ def calculate_lowess(series, times, period):
 
     day = (times - times.min()) / pd.Timedelta(days=1) + 1
     frac = period / day.max()
+    if frac < 0 or frac > 1:
+        return None
+    
     lowess = sm.nonparametric.lowess(
         endog=series, exog=day, # y, x ...
         frac=frac, is_sorted=True)
@@ -342,9 +356,10 @@ def add_summary_line(ax, df, column, l_color, function, argument, label=None, ro
     series = df[column].sum(axis=1, skipna=True) if type(column) is list else df[column]
     times = df['Mean Date']
     summary = function(series, times, argument)
-    ax.plot(times, summary, lw=2.5, c=l_color, label=label)
+    if summary is not None:
+        ax.plot(times, summary, lw=2.5, c=l_color, label=label)
+        annotate_endpoint(ax, series=summary, end=times.iloc[-1]+pd.Timedelta(days=5), rot=rot)
     add_h_refence(ax, reference=50)
-    annotate_endpoint(ax, series=summary, end=times.iloc[-1]+pd.Timedelta(days=5), rot=rot)
 
 
 def plot_finalise(ax, title=None, xlabel=None, ylabel=None, 
@@ -404,7 +419,7 @@ def plot_summary_line_by_pollster(df, column, title,
     fig, ax = initiate_plot()
     for i, pollster in enumerate(sorted(df['Brand'].unique())):
         polls = df[df['Brand'] == pollster].copy()
-        if len(polls) <= MINIMUM_POLLS_REQUIRED:
+        if len(polls) < MINIMUM_POLLS_REQUIRED:
             continue
         add_summary_line(ax, df=polls, column=column, l_color=None, 
                          function=function, argument=argument, rot=rot)
