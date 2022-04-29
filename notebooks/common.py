@@ -2,6 +2,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import ticker
+import matplotlib.dates as mdates
+
 import pathlib
 import requests
 import bs4
@@ -364,7 +367,8 @@ def add_summary_line(ax, df, column, l_color, function, argument, label=None, ro
 
 def plot_finalise(ax, title=None, xlabel=None, ylabel=None, 
                   lfooter=None, rfooter='marktheballot.blogspot.com',
-                  location='../charts/', **kwargs):
+                  location='../charts/', close=True, concise_dates=False,
+                  **kwargs):
     """Complete and save a plot image"""
     
     # annotate the plot
@@ -385,6 +389,11 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
                        c='#999999', style='italic', 
                        fontsize=9)
         
+    # format dates
+    if concise_dates:
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(
+            ax.xaxis.get_major_locator()))
+    
     ax.figure.tight_layout(pad=1.1)    
     
     if title is not None:
@@ -395,8 +404,9 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
         ax.figure.savefig(f'{file_stem}.png', dpi=300)
     
     # close
-    plt.show()
-    plt.close()
+    if close:
+        plt.show()
+        plt.close()
     
     
 def plot_summary_line(df, column, p_color, l_color, title,
