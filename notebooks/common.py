@@ -299,7 +299,7 @@ def calculate_lowess(series, times, period):
 # --- PLOTTING ---
 
 COLOR_COALITION = 'darkblue'
-COLOR_LABOR = 'darkred'
+COLOR_LABOR = '#dd0000'
 COLOR_OTHER = 'darkorange'
 COLOR_GREEN = 'darkgreen'
 
@@ -368,7 +368,7 @@ def add_summary_line(ax, df, column, l_color, function, argument, label=None, ro
 def plot_finalise(ax, title=None, xlabel=None, ylabel=None, 
                   lfooter=None, rfooter='marktheballot.blogspot.com',
                   location='../charts/', close=True, concise_dates=False,
-                  **kwargs):
+                  straighten_tl=False, **kwargs):
     """Complete and save a plot image"""
     
     # annotate the plot
@@ -393,6 +393,12 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
     if concise_dates:
         ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(
             ax.xaxis.get_major_locator()))
+    
+    # straigten tick labels
+    if straighten_tl:
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(0)
+            tick.set_ha('center')
     
     ax.figure.tight_layout(pad=1.1)    
     
