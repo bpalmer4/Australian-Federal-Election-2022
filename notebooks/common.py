@@ -403,7 +403,11 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
     ax.figure.tight_layout(pad=1.1)    
     
     if title is not None:
+        replaceable = list(r'/\^:$')
+        for char in replaceable:
+            title = title.replace(char, '')
         file_stem = f'{location}{title}'
+        print(f'DEBUG: {file_stem}')
         if 'save_suffix' in kwargs:
             file_stem += '-' + kwargs['save_suffix']
         pathlib.Path(location).mkdir(parents=True, exist_ok=True)
