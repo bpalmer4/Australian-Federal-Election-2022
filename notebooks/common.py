@@ -13,6 +13,7 @@ import statsmodels.api as sm
 import os
 import time
 import datetime
+import scipy.stats as stats
 
 from typing import List
 
@@ -296,6 +297,30 @@ def calculate_lowess(series, times, period):
     return lowess
 
 
+def calc_chi_squared(series, sample_sizes, percent=95, mean=None):
+    
+    # sanity checks
+    assert percent >= 50 and percent <= 100 
+    assert all(series >= 0) and all(series <= 100)  # series is percentages
+    assert len(series) == len(sample_sizes)
+    assert len(series) >= 2 
+
+    # set up for calculation
+    deg_of_freedom = len(series) - 1
+    two_tail = ((100.0 - percent) / 100.0) / 2.0
+    if mean is None:
+        mean = series.mean()
+    variances = (series * (100-series)) / sample_sizes
+    standard_deviations = pd.Series(np.sqrt(variances))
+    
+    # Key calculations
+    X = pow((series - mean)/standard_deviations, 2).sum()
+    X_min = stats.distributions.chi2.ppf(two_tail, df=deg_of_freedom)
+    X_max = stats.distributions.chi2.ppf(1 - two_tail, df=deg_of_freedom)
+    
+    # return results
+    return (X, X_min, X_max, deg_of_freedom, percent)
+
 # --- PLOTTING ---
 
 COLOR_COALITION = 'darkblue'
@@ -315,6 +340,24 @@ def initiate_plot():
     """Get a matplotlib figure and axes instance."""
     fig, ax = plt.subplots(figsize=(9, 4.5), constrained_layout=False)
     ax.margins(0.02)
+    return fig, ax
+
+
+def plot_chi_square(X, X_min, X_max, dof, percent=None):
+    x = np.linspace(0, X_min + X_max, 500)
+    y = pd.Series(stats.chi2(dof).pdf(x), index=x)
+
+    fig, ax = initiate_plot()
+    y.plot(ax=ax)
+    ax.axvline(X_min, color='royalblue')
+    ax.axvline(X_max, color='royalblue')
+    ax.axvline(X, color='darkorange')
+    if percent is not None:
+        ax.text(x=(X_min+X_max)/2, y=0.00, s=f'{percent}% between '+str(round(X_min, 2))+
+            ' and '+str(round(X_max, 2)), ha='center', va='bottom')
+    ax.text(x=X, y=y.max(), s='$\chi^2 = '+str(round(X, 2))+'$', 
+        ha='right', va='top', rotation=90)
+    
     return fig, ax
 
 
@@ -407,7 +450,6 @@ def plot_finalise(ax, title=None, xlabel=None, ylabel=None,
         for char in replaceable:
             title = title.replace(char, '')
         file_stem = f'{location}{title}'
-        print(f'DEBUG: {file_stem}')
         if 'save_suffix' in kwargs:
             file_stem += '-' + kwargs['save_suffix']
         pathlib.Path(location).mkdir(parents=True, exist_ok=True)
