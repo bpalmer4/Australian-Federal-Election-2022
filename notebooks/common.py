@@ -254,8 +254,8 @@ def clean(table: pd.DataFrame) -> pd.DataFrame:
 
 def flatten_col_names(columns: pd.Index) -> List[str]:
     """Flatten the hierarchical column index."""
-    
-    return [' '.join(col).strip() for col in columns.values]
+    assert columns.nlevels >= 2
+    return [' '.join(col).strip() if col[0] != col[1] else col[0] for col in columns.values]
 
 
 # --- POLL AGGREGATION ---
@@ -471,7 +471,8 @@ def plot_summary_line(df, column, p_color, l_color, title,
     plot_finalise(ax, 
                      ylabel='Per cent',
                      title=title, 
-                     lfooter=lfooter)    
+                     lfooter=lfooter,
+                     concise_dates=True)    
                      
                      
 def plot_summary_line_by_pollster(df, column, title,
@@ -491,4 +492,5 @@ def plot_summary_line_by_pollster(df, column, title,
     plot_finalise(ax, 
                   ylabel='Per cent',
                   title=title, 
-                  lfooter=lfooter)
+                  lfooter=lfooter,
+                  concise_dates=True)
