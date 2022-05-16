@@ -338,7 +338,7 @@ MARKERS = ['v', '^', '<', '>', 'o', 's', 'p', 'h', 'D', '1', '2', '3', '4', ]
 
 def initiate_plot():
     """Get a matplotlib figure and axes instance."""
-    fig, ax = plt.subplots(figsize=(8, 4), constrained_layout=False)
+    fig, ax = plt.subplots(figsize=(9, 4.5), constrained_layout=False)
     ax.margins(0.02)
     return fig, ax
 
