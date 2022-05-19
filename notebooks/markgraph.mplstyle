@@ -12,13 +12,13 @@ lines.linewidth: 2.0
 lines.solid_capstyle: butt
 
 legend.fancybox: true
-legend.fontsize: xx-small
+legend.fontsize: x-small
 legend.framealpha: 0.5
 
 axes.prop_cycle: cycler('color', ['ef5962', '5a9dd2', '7dc16d', 'f9a560', '9d69aa', 'cd6f5a', 'd680b3', '737373'])
 axes.facecolor: white
-axes.titlesize: large  # fontsize of the axes title
-axes.labelsize: medium # x and y label size
+axes.titlesize: xx-large   # fontsize of the axes title
+axes.labelsize: x-large    # x and y label size
 axes.labelcolor: 111111
 axes.axisbelow: true
 axes.grid: true
@@ -36,11 +36,11 @@ grid.color: e7e7e7
 
 xtick.major.size: 0
 xtick.minor.size: 0
-xtick.labelsize: small
+xtick.labelsize: large
 xtick.color: 333333
 ytick.major.size: 0
 ytick.minor.size: 0
-ytick.labelsize: small
+ytick.labelsize: large
 ytick.color: 333333
 
 figure.figsize: 9, 4.5 # inches
