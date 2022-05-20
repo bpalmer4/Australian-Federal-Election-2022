@@ -177,6 +177,7 @@ def get_mean_date(tokens: List[str]) -> pd.Timestamp:
     remember = tokens.copy()
     while tokens:
         token = tokens.pop()
+        
         if re.match(r'[0-9]{4}', token):
             year = token
         elif re.match(r'[A-Za-z]+', token):
@@ -217,6 +218,7 @@ def tokenise_dates(dates: pd.Series) -> pd.Series:
     
     return (
         dates
+        .str.replace('\[\d+\]$', '', regex=True) # footnotes
         .str.replace(endash, hyphen)
         .str.replace(emdash, hyphen)
         .str.replace(minus, hyphen)
